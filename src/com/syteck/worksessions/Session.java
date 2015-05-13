@@ -1,6 +1,7 @@
 package com.syteck.worksessions;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class Session {
 
@@ -8,8 +9,20 @@ public class Session {
 
 	//CLOSED = PRIVATE, TRUSTED = TRUSTED, DISABLED = CLOSED;
 	private boolean trusted, closed, disabled;
-	private ArrayList<User> players, invited;
+	private ArrayList<UUID> players, invited;
 
+	public Session(String name) {
+		
+		this.name = name;
+
+		this.trusted = false;
+		this.closed = false;
+		this.disabled = false;
+
+		players = new ArrayList<UUID>();
+		invited = new ArrayList<UUID>();
+		
+	}
 	public Session(String name, boolean trusted, boolean closed, boolean disabled) {
 
 		this.name = name;
@@ -18,11 +31,11 @@ public class Session {
 		this.closed = closed;
 		this.disabled = disabled;
 
-		players = new ArrayList<User>();
-		invited = new ArrayList<User>();
+		players = new ArrayList<UUID>();
+		invited = new ArrayList<UUID>();
 
 	}
-	public Session(String name, boolean trusted, boolean closed, boolean disabled, ArrayList<User> players, ArrayList<User> invited) {
+	public Session(String name, boolean trusted, boolean closed, boolean disabled, ArrayList<UUID> players, ArrayList<UUID> invited) {
 
 		this.name = name;
 
@@ -74,12 +87,12 @@ public class Session {
 
 	}
 
-	public ArrayList<User> getPlayerList() {
+	public ArrayList<UUID> getPlayerList() {
 
 		return this.players;
 
 	}
-	public ArrayList<User> getInviteList() {
+	public ArrayList<UUID> getInviteList() {
 
 		return this.invited;
 

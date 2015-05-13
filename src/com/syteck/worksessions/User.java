@@ -9,6 +9,16 @@ public class User {
 
 	private boolean build, trusted, banned;
 
+	public User(UUID uuid) {
+		
+		this.uuid = uuid;
+		this.session = null;
+
+		this.build = false;
+		this.trusted = false;
+		this.banned = false;
+		
+	}
 	public User(UUID uuid, boolean build, boolean trusted, boolean banned) {
 
 		this.uuid = uuid;
@@ -17,6 +27,7 @@ public class User {
 		this.build = build;
 		this.trusted = trusted;
 		this.banned = banned;
+		
 	}
 	public User(UUID uuid, Session session, boolean build, boolean trusted, boolean banned) {
 

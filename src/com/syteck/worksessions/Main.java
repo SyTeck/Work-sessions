@@ -8,10 +8,18 @@ import com.syteck.worksessions.events.Events;
 
 public class Main extends JavaPlugin {
 
+	private static Main instance;
+	public static Main getInstance() {
+		
+		return instance;
+		
+	}
 	
 	
 	@Override
 	public void onEnable() {
+		
+		instance = this;
 		
 		getCommand("ws").setExecutor(new Commands());
 		Bukkit.getPluginManager().registerEvents(new Events(), this);
