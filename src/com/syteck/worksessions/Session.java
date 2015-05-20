@@ -5,14 +5,16 @@ import java.util.UUID;
 
 public class Session {
 
+	private int id;
 	private String name;
 
 	//CLOSED = PRIVATE, TRUSTED = TRUSTED, DISABLED = CLOSED;
 	private boolean trusted, closed, disabled;
 	private ArrayList<UUID> players, invited;
 
-	public Session(String name) {
+	public Session(int id, String name) {
 		
+		this.id = id;
 		this.name = name;
 
 		this.trusted = false;
@@ -23,8 +25,9 @@ public class Session {
 		invited = new ArrayList<UUID>();
 		
 	}
-	public Session(String name, boolean trusted, boolean closed, boolean disabled) {
+	public Session(int id, String name, boolean trusted, boolean closed, boolean disabled) {
 
+		this.id = id;
 		this.name = name;
 
 		this.trusted = trusted;
@@ -35,8 +38,9 @@ public class Session {
 		invited = new ArrayList<UUID>();
 
 	}
-	public Session(String name, boolean trusted, boolean closed, boolean disabled, ArrayList<UUID> players, ArrayList<UUID> invited) {
+	public Session(int id, String name, boolean trusted, boolean closed, boolean disabled, ArrayList<UUID> players, ArrayList<UUID> invited) {
 
+		this.id = id;
 		this.name = name;
 
 		this.trusted = trusted;
@@ -48,6 +52,12 @@ public class Session {
 
 	}
 
+	public int getId() {
+		
+		return this.id;
+		
+	}
+	
 	public String getName() {
 
 		return this.name;

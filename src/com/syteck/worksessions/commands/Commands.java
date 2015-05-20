@@ -12,7 +12,7 @@ public class Commands implements CommandExecutor {
 		
 		if(!(sender instanceof Player)) {
 			
-			
+			sender.sendMessage("This plugin is only compatible with players.");
 			
 		} else {
 			

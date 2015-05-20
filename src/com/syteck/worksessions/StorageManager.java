@@ -13,10 +13,11 @@ public class StorageManager {
 
 	private File userPath;
 	private Config config;
+	private Config players;
 	private Config storage;
 
-	private static HashMap<String, Session> sessions = new HashMap<String, Session>();
-	public static HashMap<String, Session> getSessionList() {
+	private static HashMap<Integer, Session> sessions = new HashMap<Integer, Session>();
+	public static HashMap<Integer, Session> getSessionList() {
 
 		return sessions;
 
@@ -74,13 +75,8 @@ public class StorageManager {
 	}
 	public User getUser(UUID uuid) {
 
-		if(!users.containsKey(uuid)) {
-
-			users.put(uuid, new User(uuid));
-
-		}
-
 		return users.get(uuid);
+
 	}
 	public void unloadUser(UUID uuid) {
 
@@ -130,10 +126,27 @@ public class StorageManager {
 		config.save();
 	}
 
+	public void createSession(Session session) {
+
+		sessions.put(session.getId(), session);
+
+	}
+	public Session getSession(int id) {
+
+		return sessions.get(id);
+
+	}
+	public void deleteSession(int id) {
+
+		sessions.remove(id);
+
+	}
+
 	public void load() {
 
 		for(String str: storage.getYaml().getKeys(false)) {
 
+			int id = storage.getYaml().getInt(str + ".id");
 			String name = storage.getYaml().getString(str + ".name");
 			boolean trusted = storage.getYaml().getBoolean(str + ".trusted"), closed = storage.getYaml().getBoolean(str + ".closed"), disabled = storage.getYaml().getBoolean(str + ".disabled");
 			ArrayList<UUID> players = new ArrayList<UUID>(), invites = new ArrayList<UUID>();
@@ -150,13 +163,18 @@ public class StorageManager {
 
 			}
 
-			Session session = new Session(name, trusted, closed, disabled, players, invites);
-			sessions.put(name, session);
+			Session session = new Session(id, name, trusted, closed, disabled, players, invites);
+			sessions.put(id, session);
 		}
 
 	}
 
 	public void save() {
+
+		//Potential bug
+		players.getYaml().set("trusted", getTrustList());
+		players.getYaml().set("banned", getBanList());
+		//Potential bug
 
 		for(Entry<UUID, User> entry: users.entrySet()) {
 
@@ -164,15 +182,16 @@ public class StorageManager {
 
 		}
 
-		for(Entry<String, Session> entry: sessions.entrySet()) {
+		for(Entry<Integer, Session> entry: sessions.entrySet()) {
 
-			String name = entry.getKey();
+			int id = entry.getKey();
 			Session session = entry.getValue();
 
-			storage.getYaml().set(name + ".name", name);
-			storage.getYaml().set(name + ".trusted", session.isTrusted());
-			storage.getYaml().set(name + ".closed", session.isClosed());
-			storage.getYaml().set(name + ".disabled", session.isDisabled());
+			storage.getYaml().set(id + ".id", id);
+			storage.getYaml().set(id + ".name", session.getName());
+			storage.getYaml().set(id + ".trusted", session.isTrusted());
+			storage.getYaml().set(id + ".closed", session.isClosed());
+			storage.getYaml().set(id + ".disabled", session.isDisabled());
 
 			ArrayList<String> players = new ArrayList<String>();
 			ArrayList<String> invites = new ArrayList<String>();
@@ -189,10 +208,11 @@ public class StorageManager {
 
 			}
 
-			storage.getYaml().set(name + ".invites", players);
-			storage.getYaml().set(name + ".invites", invites);
+			storage.getYaml().set(id + ".invites", players);
+			storage.getYaml().set(id + ".invites", invites);
 		}
 
+		players.save();
 		storage.save();
 	}
 
@@ -209,6 +229,18 @@ public class StorageManager {
 			if(!config.exist()) {
 
 				Bukkit.getLogger().log(Level.INFO, "Failed to create config.yml, contact developer.");
+				created = false;
+
+			}
+		}
+
+		if(!players.exist()) {
+
+			Bukkit.getLogger().log(Level.INFO, "Failed to find players.yml, creating new one.");
+
+			if(!players.create()) {
+
+				Bukkit.getLogger().log(Level.INFO, "Failed to create players.yml, contact developer.");
 				created = false;
 
 			}
@@ -247,7 +279,8 @@ public class StorageManager {
 		Main main = Main.getInstance();
 
 		userPath = new File(main.getDataFolder() + File.pathSeparator + "users");
-		config = new Config(new File(main.getDataFolder(), "config.yml")); 
+		config = new Config(new File(main.getDataFolder(), "config.yml"));
+		players = new Config(new File(main.getDataFolder(), "players.yml"));
 		storage = new Config(new File(main.getDataFolder(), "sessions.yml"));
 
 		verify();
