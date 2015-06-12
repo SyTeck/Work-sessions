@@ -7,7 +7,7 @@ public class User {
 	private UUID uuid;
 	private Session session;
 
-	private boolean build, trusted, banned;
+	private boolean build, area, trusted, banned;
 
 	public User(UUID uuid) {
 		
@@ -17,6 +17,7 @@ public class User {
 		this.build = false;
 		this.trusted = false;
 		this.banned = false;
+		this.area = false;
 		
 	}
 	public User(UUID uuid, boolean build, boolean trusted, boolean banned) {
@@ -27,6 +28,7 @@ public class User {
 		this.build = build;
 		this.trusted = trusted;
 		this.banned = banned;
+		this.area = false;
 		
 	}
 	public User(UUID uuid, Session session, boolean build, boolean trusted, boolean banned) {
@@ -37,6 +39,7 @@ public class User {
 		this.build = build;
 		this.trusted = trusted;
 		this.banned = banned;
+		this.area = false;
 
 	}
 
@@ -54,6 +57,18 @@ public class User {
 	public boolean canBuild() {
 		
 		return this.build;
+		
+	}
+	
+	public void setArea(boolean value) {
+		
+		this.area = value;
+		
+	}
+	
+	public boolean getArea() {
+		
+		return this.area;
 		
 	}
 

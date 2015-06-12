@@ -15,7 +15,7 @@ public class CommandHelp implements Command {
 			sender.sendMessage(ChatColor.GOLD+"User commands:");
 			sender.sendMessage(ChatColor.YELLOW+"join, leave, list, spawn, kit, help");
 			
-			if(sender.hasPermission("ws.assist")) {
+			if(sender.hasPermission("ws.assist") && !sender.hasPermission("ws.manage") && !sender.hasPermission("ws.admin")) {
 
 				sender.sendMessage(" ");
 				sender.sendMessage(ChatColor.GOLD+"Assistant commands:");
@@ -23,7 +23,7 @@ public class CommandHelp implements Command {
 
 			}
 
-			if(sender.hasPermission("ws.manage")) {
+			if(sender.hasPermission("ws.manage") && !sender.hasPermission("ws.admin")) {
 
 				sender.sendMessage(" ");
 				sender.sendMessage(ChatColor.GOLD+"Manager commands:");

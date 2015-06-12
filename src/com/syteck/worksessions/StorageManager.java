@@ -8,13 +8,16 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 public class StorageManager {
 
-	private File userPath;
-	private Config config;
-	private Config players;
-	private Config storage;
+	private static File userPath;
+	private static Config config;
+	private static Config players;
+	private static Config storage;
 
 	private static HashMap<Integer, Session> sessions = new HashMap<Integer, Session>();
 	public static HashMap<Integer, Session> getSessionList() {
@@ -44,7 +47,7 @@ public class StorageManager {
 
 	}
 
-	public void loadUser(UUID uuid) {
+	public static void loadUser(UUID uuid) {
 
 		Config config = new Config(new File(userPath, uuid.toString()));
 
@@ -73,12 +76,12 @@ public class StorageManager {
 
 		}
 	}
-	public User getUser(UUID uuid) {
+	public static User getUser(UUID uuid) {
 
 		return users.get(uuid);
 
 	}
-	public void unloadUser(UUID uuid) {
+	public static void unloadUser(UUID uuid) {
 
 		Config config = new Config(new File(userPath, uuid.toString()));
 		if(!config.exist()) config.create();
@@ -103,7 +106,7 @@ public class StorageManager {
 		user.getSession().getPlayerList().remove(user);
 		users.remove(user);
 	}
-	public void saveUser(UUID uuid) {
+	public static void saveUser(UUID uuid) {
 
 		Config config = new Config(new File(userPath, uuid.toString()));
 		if(!config.exist()) config.create();
@@ -126,30 +129,48 @@ public class StorageManager {
 		config.save();
 	}
 
-	public void createSession(Session session) {
+	public static void createSession(Session session) {
 
 		sessions.put(session.getId(), session);
 
 	}
-	public Session getSession(int id) {
+	public static Session getSession(int id) {
 
 		return sessions.get(id);
 
 	}
-	public void deleteSession(int id) {
+	public static void deleteSession(int id) {
 
 		sessions.remove(id);
 
 	}
 
-	public void load() {
+	public static void load() {
 
-		for(String str: storage.getYaml().getKeys(false)) {
+		YamlConfiguration yaml = storage.getYaml();
 
-			int id = storage.getYaml().getInt(str + ".id");
-			String name = storage.getYaml().getString(str + ".name");
+		for(String str: yaml.getKeys(false)) {
+
+			int id = yaml.getInt(str + ".id");
+			String name = yaml.getString(str + ".name");
 			boolean trusted = storage.getYaml().getBoolean(str + ".trusted"), closed = storage.getYaml().getBoolean(str + ".closed"), disabled = storage.getYaml().getBoolean(str + ".disabled");
 			ArrayList<UUID> players = new ArrayList<UUID>(), invites = new ArrayList<UUID>();
+			Border border = new Border();
+
+			if(yaml.contains(str + ".border")) {
+
+				World world = Bukkit.getWorld(yaml.getString(str + ".border.world"));
+				Location loc1 = new Location(world, yaml.getInt(str + ".border.x1"), yaml.getInt(str + ".border.y1"), yaml.getInt(str + ".border.z1")), loc2 = new Location(world, yaml.getInt(str + ".border.x2"), yaml.getInt(str + ".border.y2"), yaml.getInt(str + ".border.z2"));
+				border = new Border(world, loc1, loc2);
+
+			}
+
+			Location spawn;
+
+			World spawnW = Bukkit.getWorld(yaml.getString(str + ".spawn.world"));
+			double spawnX = yaml.getDouble(str + ".spawn.x"), spawnY = yaml.getDouble(str + ".spawn.y"), spawnZ = yaml.getDouble(str + ".spawn.z");
+
+			spawn = new Location(spawnW, spawnX, spawnY, spawnZ);
 
 			for(String pStr: storage.getYaml().getStringList(str + ".players")) {
 
@@ -163,13 +184,13 @@ public class StorageManager {
 
 			}
 
-			Session session = new Session(id, name, trusted, closed, disabled, players, invites);
+			Session session = new Session(id, name, border, spawn, trusted, closed, disabled, players, invites);
 			sessions.put(id, session);
 		}
 
 	}
 
-	public void save() {
+	public static void save() {
 
 		//Potential bug
 		players.getYaml().set("trusted", getTrustList());
@@ -186,12 +207,32 @@ public class StorageManager {
 
 			int id = entry.getKey();
 			Session session = entry.getValue();
+			Border border = session.getBorder();
 
 			storage.getYaml().set(id + ".id", id);
 			storage.getYaml().set(id + ".name", session.getName());
 			storage.getYaml().set(id + ".trusted", session.isTrusted());
 			storage.getYaml().set(id + ".closed", session.isClosed());
 			storage.getYaml().set(id + ".disabled", session.isDisabled());
+
+			storage.getYaml().set(id + ".spawn.world", session.getSpawn().getWorld().getName());
+			storage.getYaml().set(id + ".spawn.x", session.getSpawn().getBlockX());
+			storage.getYaml().set(id + ".spawn.y", session.getSpawn().getBlockY());
+			storage.getYaml().set(id + ".spawn.z", session.getSpawn().getBlockZ());
+
+			if(border.isFinished()) {
+
+				storage.getYaml().set(id + ".border.world", border.getWorld().getName());
+
+				storage.getYaml().set(id + ".border.x1", border.getLocation(1).getBlockX());
+				storage.getYaml().set(id + ".border.y1", border.getLocation(1).getBlockY());
+				storage.getYaml().set(id + ".border.z1", border.getLocation(1).getBlockZ());
+
+				storage.getYaml().set(id + ".border.x2", border.getLocation(2).getBlockX());
+				storage.getYaml().set(id + ".border.y2", border.getLocation(2).getBlockY());
+				storage.getYaml().set(id + ".border.z2", border.getLocation(2).getBlockZ());
+
+			}
 
 			ArrayList<String> players = new ArrayList<String>();
 			ArrayList<String> invites = new ArrayList<String>();
@@ -216,7 +257,7 @@ public class StorageManager {
 		storage.save();
 	}
 
-	public boolean verify() {
+	public static boolean verify() {
 
 		Main main = Main.getInstance();
 		boolean created = true;
