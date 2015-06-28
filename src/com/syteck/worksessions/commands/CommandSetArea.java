@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import com.syteck.worksessions.Session;
 import com.syteck.worksessions.StorageManager;
 import com.syteck.worksessions.User;
+import com.syteck.worksessions.utils.Util;
 
 public class CommandSetArea implements Command {
 
@@ -28,7 +29,7 @@ public class CommandSetArea implements Command {
 	@Override
 	public boolean verify(CommandSender sender, String[] args) {
 
-		if(!sender.hasPermission("ws.manage") && !sender.hasPermission("ws.admin")) {
+		if(!Util.hasPermission(sender, "ws.manage")) {
 
 			sender.sendMessage(ChatColor.RED+"You do not have permission to do this.");
 

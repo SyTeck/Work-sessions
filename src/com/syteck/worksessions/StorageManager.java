@@ -78,8 +78,31 @@ public class StorageManager {
 	}
 	public static User getUser(UUID uuid) {
 
-		return users.get(uuid);
+		if(users.containsKey(uuid)) return users.get(uuid);
 
+		Config config = new Config(new File(userPath, uuid.toString()));
+
+		if(config.exist()) {
+
+			Session session = sessions.get(config.getYaml().getString("session"));
+			boolean build = config.getYaml().getBoolean("build");
+			boolean trusted = getTrustList().contains(uuid);
+			boolean banned = getBanList().contains(uuid);
+
+			if(session != null) {
+
+				return new User(uuid, session, build, trusted, banned);
+
+			} else {
+
+				return new User(uuid, false, trusted, banned);
+
+			}
+		} else {
+			
+			return null;
+			
+		}
 	}
 	public static void unloadUser(UUID uuid) {
 
@@ -153,7 +176,7 @@ public class StorageManager {
 
 			int id = yaml.getInt(str + ".id");
 			String name = yaml.getString(str + ".name");
-			boolean trusted = storage.getYaml().getBoolean(str + ".trusted"), closed = storage.getYaml().getBoolean(str + ".closed"), disabled = storage.getYaml().getBoolean(str + ".disabled");
+			boolean trusted = yaml.getBoolean(str + ".trusted"), closed = yaml.getBoolean(str + ".closed"), disabled = yaml.getBoolean(str + ".disabled"), teamspeak = yaml.getBoolean(str + ".teamspeak");
 			ArrayList<UUID> players = new ArrayList<UUID>(), invites = new ArrayList<UUID>();
 			Border border = new Border();
 
@@ -184,7 +207,7 @@ public class StorageManager {
 
 			}
 
-			Session session = new Session(id, name, border, spawn, trusted, closed, disabled, players, invites);
+			Session session = new Session(id, name, border, spawn, trusted, closed, disabled, teamspeak, players, invites);
 			sessions.put(id, session);
 		}
 
@@ -214,6 +237,7 @@ public class StorageManager {
 			storage.getYaml().set(id + ".trusted", session.isTrusted());
 			storage.getYaml().set(id + ".closed", session.isClosed());
 			storage.getYaml().set(id + ".disabled", session.isDisabled());
+			storage.getYaml().set(id + ".teamspeak", session.getTeamspeak());
 
 			storage.getYaml().set(id + ".spawn.world", session.getSpawn().getWorld().getName());
 			storage.getYaml().set(id + ".spawn.x", session.getSpawn().getBlockX());

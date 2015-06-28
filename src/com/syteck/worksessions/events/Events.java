@@ -1,9 +1,11 @@
 package com.syteck.worksessions.events;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -13,11 +15,31 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.syteck.worksessions.Border;
+import com.syteck.worksessions.Session;
 import com.syteck.worksessions.StorageManager;
 import com.syteck.worksessions.User;
+import com.syteck.worksessions.utils.Util;
 
 public class Events implements Listener {
 
+	@EventHandler
+	public void onUserJoinSessionEvent(UserJoinSessionEvent event) {
+		
+		User user = event.getUser();
+		Player player = Bukkit.getPlayer(user.getUUID());
+		
+		user.getSession().broadcast(ChatColor.YELLOW+player.getName() + " has joined the session.");
+	}
+	
+	@EventHandler
+	public void onUserLeaveSessionEvent(UserLeaveSessionEvent event) {
+		
+		User user = event.getUser();
+		Player player = Bukkit.getPlayer(user.getUUID());
+		
+		user.getSession().broadcast(ChatColor.YELLOW+player.getName() + " has left the session.");
+	}
+	
 	@EventHandler
 	public void onPlayerJoinEvent(PlayerJoinEvent event) {
 
@@ -35,22 +57,76 @@ public class Events implements Listener {
 		StorageManager.unloadUser(player.getUniqueId());
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockBreakEvent(BlockBreakEvent event) {
 
 		Player player = event.getPlayer();
+		User user = StorageManager.getUser(player.getUniqueId());
 
-		if(player.hasPermission("ws.exceed")) return;
-
+		if(Util.hasPermission(player, "ws.exceed")) return;
+		
+		if(!user.hasSession()) {
+			
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED+"You are not allowed to build freely in this world.");
+			
+		} else {
+			
+			Session session = user.getSession();
+			
+			if(!session.getBorder().contains(event.getBlock().getLocation())) {
+				
+				event.setCancelled(true);
+				player.sendMessage(ChatColor.RED+"You are not allowed to build without being in a session.");
+				
+			} else if(!user.canBuild()) {
+				
+				event.setCancelled(true);
+				player.sendMessage(ChatColor.RED+"You are not allowed to build in this session.");
+				
+			} else if(session.isDisabled()) {
+				
+				event.setCancelled(true);
+				player.sendMessage(ChatColor.RED+"You are not allowed to build while the session is disabled.");
+				
+			}
+		}
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlaceEvent(BlockPlaceEvent event) {
 
 		Player player = event.getPlayer();
+		User user = StorageManager.getUser(player.getUniqueId());
 
-		if(player.hasPermission("ws.exceed")) return;
-
+		if(Util.hasPermission(player, "ws.exceed")) return;
+		
+		if(!user.hasSession()) {
+			
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED+"You are not allowed to build freely in this world.");
+			
+		} else {
+			
+			Session session = user.getSession();
+			
+			if(!session.getBorder().contains(event.getBlockPlaced().getLocation())) {
+				
+				event.setCancelled(true);
+				player.sendMessage(ChatColor.RED+"You can not place blocks outside your session.");
+				
+			} else if(!user.canBuild()) {
+				
+				event.setCancelled(true);
+				player.sendMessage(ChatColor.RED+"You are not allowed to build in this session.");
+				
+			} else if(session.isDisabled()) {
+				
+				event.setCancelled(true);
+				player.sendMessage(ChatColor.RED+"You are not allowed to build while the session is disabled.");
+				
+			}
+		}
 	}
 
 	@EventHandler

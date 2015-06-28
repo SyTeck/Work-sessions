@@ -3,6 +3,7 @@ package com.syteck.worksessions;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 public class Session {
@@ -14,10 +15,10 @@ public class Session {
 
 	//CLOSED = PRIVATE, TRUSTED = TRUSTED, DISABLED = CLOSED;
 	private User manager;
-	private boolean trusted, closed, disabled;
+	private boolean trusted, closed, disabled, teamspeak;
 	private ArrayList<UUID> players, invited;
 
-	public Session(int id, String name, Border border, Location spawn, boolean trusted, boolean closed, boolean disabled, ArrayList<UUID> players, ArrayList<UUID> invited) {
+	public Session(int id, String name, Border border, Location spawn, boolean trusted, boolean closed, boolean disabled, boolean teamspeak, ArrayList<UUID> players, ArrayList<UUID> invited) {
 
 		this.id = id;
 		this.name = name;
@@ -117,6 +118,26 @@ public class Session {
 
 		return this.disabled;
 
+	}
+	
+	public void setTeamspeak(boolean value) {
+		
+		this.teamspeak = value;
+		
+	}
+	public boolean getTeamspeak() {
+		
+		return this.teamspeak;
+		
+	}
+	
+	public void broadcast(String str) {
+		
+		for(UUID uuid: players) {
+			
+			Bukkit.getPlayer(uuid).sendMessage(str);
+			
+		}
 	}
 
 	public ArrayList<UUID> getPlayerList() {

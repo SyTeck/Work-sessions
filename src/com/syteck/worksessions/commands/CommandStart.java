@@ -11,6 +11,7 @@ import com.syteck.worksessions.Border;
 import com.syteck.worksessions.Session;
 import com.syteck.worksessions.StorageManager;
 import com.syteck.worksessions.User;
+import com.syteck.worksessions.utils.Util;
 
 public class CommandStart implements Command {
 
@@ -34,7 +35,7 @@ public class CommandStart implements Command {
 			
 			ArrayList<UUID> players = new ArrayList<UUID>(), invited = new ArrayList<UUID>();
 			User user = StorageManager.getUser(((Player)sender).getUniqueId());
-			Session session = new Session(id, name, new Border(), ((Player)sender).getLocation(), false, false, false, players, invited);
+			Session session = new Session(id, name, new Border(), ((Player)sender).getLocation(), false, false, false, false, players, invited);
 			
 			session.setDisabled(true);
 			session.setManager(user);
@@ -55,7 +56,7 @@ public class CommandStart implements Command {
 	@Override
 	public boolean verify(CommandSender sender, String[] args) {
 		
-		if(!sender.hasPermission("ws.manage") && !sender.hasPermission("ws.admin")) {
+		if(!Util.hasPermission(sender, "ws.manage")) {
 			
 			sender.sendMessage(ChatColor.RED+"You do not have permission to do this.");
 			

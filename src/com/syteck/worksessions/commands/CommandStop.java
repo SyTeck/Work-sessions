@@ -56,7 +56,7 @@ public class CommandStop implements Command {
 	@Override
 	public boolean verify(CommandSender sender, String[] args) {
 
-		if(!sender.hasPermission("ws.manage") && !sender.hasPermission("ws.admin")) {
+		if(!Util.hasPermission(sender, "ws.manage")) {
 
 			sender.sendMessage(ChatColor.RED+"You do not have permission to do this.");
 

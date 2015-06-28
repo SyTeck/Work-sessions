@@ -67,6 +67,12 @@ public class Border {
 
 		return (loc.getX() >= loc1.getX()) && (loc.getX() <= loc2.getX()) && (loc.getY() >= loc1.getY()) && (loc.getY() <= loc2.getY()) && (loc.getZ() <= loc1.getZ()) && (loc.getZ() <= loc2.getZ());
 	}
+	
+	public boolean contains(Location loc) {
+		
+		return (loc.getX() >= loc1.getX()) && (loc.getX() <= loc2.getX()) && (loc.getY() >= loc1.getY()) && (loc.getY() <= loc2.getY()) && (loc.getZ() <= loc1.getZ()) && (loc.getZ() <= loc2.getZ());
+		
+	}
 
 	//TODO: ONLY FOR TESTING
 	public void build() {

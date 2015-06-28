@@ -3,6 +3,8 @@ package com.syteck.worksessions.commands;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import com.syteck.worksessions.utils.Util;
+
 public class CommandHelp implements Command {
 
 	@Override
@@ -15,7 +17,7 @@ public class CommandHelp implements Command {
 			sender.sendMessage(ChatColor.GOLD+"User commands:");
 			sender.sendMessage(ChatColor.YELLOW+"join, leave, list, spawn, kit, help");
 			
-			if(sender.hasPermission("ws.assist") && !sender.hasPermission("ws.manage") && !sender.hasPermission("ws.admin")) {
+			if(Util.hasPermission(sender, "ws.assist")) {
 
 				sender.sendMessage(" ");
 				sender.sendMessage(ChatColor.GOLD+"Assistant commands:");
@@ -23,7 +25,7 @@ public class CommandHelp implements Command {
 
 			}
 
-			if(sender.hasPermission("ws.manage") && !sender.hasPermission("ws.admin")) {
+			if(Util.hasPermission(sender, "ws.manage")) {
 
 				sender.sendMessage(" ");
 				sender.sendMessage(ChatColor.GOLD+"Manager commands:");
@@ -31,7 +33,7 @@ public class CommandHelp implements Command {
 
 			}
 
-			if(sender.hasPermission("ws.admin")) {
+			if(Util.hasPermission(sender, "ws.admin")) {
 
 				sender.sendMessage(" ");
 				sender.sendMessage(ChatColor.GOLD+"Admin commands:");
@@ -44,7 +46,7 @@ public class CommandHelp implements Command {
 	@Override
 	public boolean verify(CommandSender sender, String[] args) {
 		
-		if(!sender.hasPermission("ws.user")) {
+		if(!Util.hasPermission(sender, "ws.user")) {
 			
 			sender.sendMessage(ChatColor.RED+"You do not have permission to do this.");
 			
