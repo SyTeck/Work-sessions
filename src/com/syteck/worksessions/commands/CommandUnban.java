@@ -2,9 +2,8 @@ package com.syteck.worksessions.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.syteck.worksessions.StorageManager;
 import com.syteck.worksessions.User;
 import com.syteck.worksessions.utils.Util;
@@ -17,7 +16,7 @@ public class CommandUnban implements Command {
 
 		if(verify(sender, args)) {
 
-			Player player = Bukkit.getPlayerExact(args[1]);
+			OfflinePlayer player = Bukkit.getOfflinePlayer(args[1]);
 			User user = StorageManager.getUser(player.getUniqueId());
 			
 			user.setBanned(false);
@@ -28,7 +27,7 @@ public class CommandUnban implements Command {
 
 			if(player.isOnline()) {
 
-				player.sendMessage(ChatColor.GREEN+"You have been unbanned from joining work sessions.");
+				player.getPlayer().sendMessage(ChatColor.GREEN+"You have been unbanned from joining work sessions.");
 
 			}
 		}
@@ -52,14 +51,14 @@ public class CommandUnban implements Command {
 			return false;
 		}
 
-		if(StorageManager.getUser(Bukkit.getPlayerExact(args[1]).getUniqueId()) == null) {
+		if(StorageManager.getUser(Bukkit.getOfflinePlayer(args[1]).getUniqueId()) == null) {
 
 			sender.sendMessage(ChatColor.RED+"This player does not exist.");
 
 			return false;
 		}
 
-		if(!StorageManager.getUser(Bukkit.getPlayerExact(args[1]).getUniqueId()).isBanned()) {
+		if(!StorageManager.getUser(Bukkit.getOfflinePlayer(args[1]).getUniqueId()).isBanned()) {
 
 			sender.sendMessage(ChatColor.RED+"This player is not banned.");
 
